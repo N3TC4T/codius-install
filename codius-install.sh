@@ -99,7 +99,7 @@ if [[ -z "$SECRET" ]]; then
    exit 1
 fi
 
-read "[?] Running moneyd in ripple testnet ? [Y/n] " -e TESTNET=${TESTNET:l} #tolower
+read -p "[?] Running moneyd in ripple testnet ? [Y/n] " -e TESTNET=${TESTNET:l} #tolower
 
 # Email for certbot
 echo "[+] What is your Email address ?"
