@@ -142,6 +142,8 @@ if [[ -z "$HOSTNAME" ]]; then
    exit 1
 fi
 
+hostnamectl set-hostname $HOSTNAME
+
 
 # Wallet secret for moneyd
 echo "[+] What is your XRP wallet secret (need for moneyd) ?"
