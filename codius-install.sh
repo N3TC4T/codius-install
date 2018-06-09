@@ -99,9 +99,6 @@ if [[ -z "$SECRET" ]]; then
    exit 1
 fi
 
-read -p "[?] Running moneyd in ripple testnet ? [Y/n] " -e -i n TESTNET
-$TESTNET=${TESTNET:l} #tolower
-
 # Email for certbot
 echo "[+] What is your Email address ?"
 read -p "Email: " -e EMAIL
@@ -133,13 +130,8 @@ sudo yum install -y https://s3.us-east-2.amazonaws.com/codius-bucket/moneyd-xrp-
 # Configuring moneyd and start service
 [ -f /root/.moneyd.json ] && mv /root/.moneyd.json /root/.moneyd.json.back
 
-if [[ $TESTNET =~ ^(yes|y| ) ]] || [[ -z $TESTNET ]]; then
-	coloredEcho "\n[!] Configure Moneyd [TESTNET] ...\n" yellow
-	echo -ne "$SECRET\n" | /usr/bin/moneyd xrp:configure -t
-else
-	coloredEcho "\n[!] Configure Moneyd ...\n" yellow
-	echo -ne "$SECRET\n" | /usr/bin/moneyd xrp:configure
-fi
+coloredEcho "\n[!] Configure Moneyd ...\n" yellow
+echo -ne "$SECRET\n" | /usr/bin/moneyd xrp:configure
 
 
 if pgrep systemd-journal; then
