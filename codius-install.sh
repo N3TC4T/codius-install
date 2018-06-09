@@ -217,7 +217,6 @@ certbot certonly --manual -d "${HOSTNAME}" -d "*.${HOSTNAME}" --agree-tos --emai
 
 # Nginx ==============================================
 
-
 coloredEcho "\n[!] Installing Nginx ...\n" green
 # Nginx
 sudo yum install -y nginx
@@ -228,9 +227,17 @@ else
     /etc/init.d/nginx enable
 fi
 
+if [[ ! -e /etc/nginx/default.d ]]; then
+	mkdir /etc/nginx/default.d
+fi
+
 echo 'return 301 https://$host$request_uri;' | sudo tee /etc/nginx/default.d/ssl-redirect.conf
 sudo openssl dhparam -out /etc/nginx/dhparam.pem 2048
 
+
+if [[ ! -e /etc/nginx/conf.d ]]; then
+	mkdir /etc/nginx/conf.d
+fi
 
 echo "server {
   listen 443 ssl;
