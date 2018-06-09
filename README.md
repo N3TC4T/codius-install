@@ -1,7 +1,7 @@
 ## codius-install
-Codius (https://codius.org/) installer fo CentOS.
+Codius (https://codius.org/) installer for CentOS.
 
-This script will let you setup your own codius server in no more than a minute, even if you haven't used codius before. It has been designed to be as unobtrusive and universal as possible.
+This script will let you setup your own codius peer in no more than a minute, even if you haven't used codius before. It has been designed to be as unobtrusive and universal as possible.
 
 ### Installation
 Run the script and follow the assistant:
