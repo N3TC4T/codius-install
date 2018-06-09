@@ -54,7 +54,7 @@ else
 	exit
 fi
 
-if [[ OS != centos ]]; then
+if [[ $OS != centos ]]; then
   coloredEcho "Sorry but for now just Centos supported!" red
   exit
 fi
