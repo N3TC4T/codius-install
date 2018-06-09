@@ -281,6 +281,6 @@ fi
 
 
 coloredEcho "\n[!]Congratulations , it's look like Codius installed successfuly!" green
-coloredEcho "\n[-]You can check your Codius with opening $HOSTNAME or by visiting the peers list in https://codius.justmoon.com/peers "
+coloredEcho "\n[-]You can check your Codius with opening $HOSTNAME/version or by visiting the peers list in https://codius.justmoon.com/peers "
 coloredEcho "\n[-]Good luck :)"
 
