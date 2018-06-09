@@ -1,10 +1,12 @@
 #!/bin/bash
 #
-# https://github.com/xrp-community/codius-install
+# https://github.com/xrp-community/codius-centos-installer
+#
+# base tutorial : https://medium.com/codius/how-to-run-your-own-codius-host-42e13afe1fb2
 #
 # Copyright (c) 2018 XRP Community. Released under the MIT License.
 #
-# Coded By https://twitter.com/baltazar223 
+# coded by https://twitter.com/baltazar223
 
 
 set -o nounset
@@ -12,62 +14,6 @@ set -o errexit
 set -eu
 
 # Functions ==============================================
-
-# return 1 if global command line program installed, else 0
-# example
-# echo "node: $(program_is_installed node)"
-function program_is_installed {
-  # set to 1 initially
-  local return_=1
-  # set to 0 if not found
-  type $1 >/dev/null 2>&1 || { local return_=0; }
-  # return value
-  echo "$return_"
-}
-
-# return 1 if local npm package is installed at ./node_modules, else 0
-# example
-# echo "gruntacular : $(npm_package_is_installed gruntacular)"
-function npm_package_is_installed {
-  # set to 1 initially
-  local return_=1
-  # set to 0 if not found
-  ls node_modules | grep $1 >/dev/null 2>&1 || { local return_=0; }
-  # return value
-  echo "$return_"
-}
-
-# display a message in red with a cross by it
-# example
-# echo echo_fail "No"
-function echo_fail {
-  # echo first argument in red
-  printf "\e[31m✘ ${1}"
-  # reset colours back to normal
-  printf "\033\e[0m"
-}
-
-# display a message in green with a tick by it
-# example
-# echo echo_fail "Yes"
-function echo_pass {
-  # echo first argument in green
-  printf "\e[32m✔ ${1}"
-  # reset colours back to normal
-  printf "\033\e[0m"
-}
-
-# echo pass or fail
-# example
-# echo echo_if 1 "Passed"
-# echo echo_if 0 "Failed"
-function echo_if {
-  if [ $1 == 1 ]; then
-    echo_pass $2
-  else
-    echo_fail $2
-  fi
-}
 
 function coloredEcho(){
     local exp=$1;
@@ -88,7 +34,6 @@ function coloredEcho(){
     echo -e $exp;
     tput sgr0;
 }
-
 
 # ============================================== Functions
 
@@ -123,15 +68,15 @@ echo
 
 
 # Server Ip Address
-echo "First, provide the IPv4 address of the network interface"
+echo "[+] First, provide the IPv4 address of the network interface"
 # Autodetect IP address and pre-fill for the user
 IP=$(ip addr | grep 'inet' | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | head -1)
 read -p "IP address: " -e -i $IP IP
 # If $IP is a private IP address, the server must be behind NAT
 if echo "$IP" | grep -qE '^(10\.|172\.1[6789]\.|172\.2[0-9]\.|172\.3[01]\.|192\.168)'; then
     echo
-    echo "This server is behind NAT. What is the public IPv4 address or hostname?"
-    read -p "Public IP address / hostname: " -e PUBLICIP
+    echo "This server is behind NAT. What is the public IPv4 address?"
+    read -p "Public IP address: " -e PUBLICIP
 fi
 
 # Hostname
@@ -142,6 +87,7 @@ if [[ -z "$HOSTNAME" ]]; then
    exit 1
 fi
 
+# Set hostname 
 hostnamectl set-hostname $HOSTNAME
 
 
@@ -152,6 +98,9 @@ if [[ -z "$SECRET" ]]; then
    printf '%s\n' "No Secret entered, exiting..."
    exit 1
 fi
+
+read "[?] Running moneyd in ripple testnet ? [Y/n] "
+TESTNET=${TESTNET:l} #tolower
 
 # Email for certbot
 echo "[+] What is your Email address ?"
@@ -164,6 +113,7 @@ fi
 
 
 # Hyperd ==============================================
+
 coloredEcho "\n[!] Installing required packages ...\n" green
 sudo yum install -y gcc-c++ make epel-release git
 coloredEcho "\n[!] Installing Hyperd ...\n" green
@@ -171,8 +121,8 @@ curl -sSl https://coiltest.s3.amazonaws.com/upload/latest/hyper-bootstrap.sh | b
 
 # ============================================== Hyperd
 
+# Moneyd ==============================================
 
-# Installing Moneyd
 coloredEcho "\n[!] Installing Nodejs ...\n" green
 curl --silent --location https://rpm.nodesource.com/setup_10.x | sudo bash -
 sudo yum install -y nodejs
@@ -182,7 +132,15 @@ sudo yum install -y https://s3.us-east-2.amazonaws.com/codius-bucket/moneyd-xrp-
 
 # Configuring moneyd and start service
 [ -f /root/.moneyd.json ] && mv /root/.moneyd.json /root/.moneyd.json.back
-echo -ne "$SECRET\n" | /usr/bin/moneyd xrp:configure
+
+if [[ $TESTNET =~ ^(yes|y| ) ]] || [[ -z $TESTNET ]]; then
+	coloredEcho "\n[!] Configure Moneyd [TESTNET] ...\n" yellow
+	echo -ne "$SECRET\n" | /usr/bin/moneyd xrp:configure -t
+else
+	coloredEcho "\n[!] Configure Moneyd ...\n" yellow
+	echo -ne "$SECRET\n" | /usr/bin/moneyd xrp:configure
+fi
+
 
 if pgrep systemd-journal; then
     systemctl restart moneyd-xrp
@@ -190,8 +148,11 @@ else
     /etc/init.d/moneyd-xrp restart
 fi
 
+# ============================================== Moneyd
 
-# Installing Codius
+
+# Codius ==============================================
+
 coloredEcho "\n[!] Installing Codius ...\n" green
 sudo npm install -g codiusd --unsafe-perm
 
@@ -214,8 +175,6 @@ Group=root
 [Install]
 WantedBy=multi-user.target" > /etc/systemd/system/codiusd.service
 
-
-
 if pgrep systemd-journal; then
     systemctl enable codiusd
     systemctl restart codiusd
@@ -224,7 +183,9 @@ else
     /etc/init.d/codiusd restart
 fi
 
+# ============================================== Codius
 
+# Subdomain DNS ==============================================
 echo
 coloredEcho "\n[!] Please create two A records on your DNS and press enter to continue : \n" green
 echo "$HOSTNAME.    300     IN      A       $IP
@@ -236,13 +197,17 @@ while true; do
     if [ $? -ne 0 ] ; then #if ping exits nonzero...
 	coloredEcho "[!] It's look like the host $HOSTNAME is not avalibale yet , waiting 30s ... " red
     else
-	coloredEcho "\n[!] Everything looks fine now , continuing ... \n" green
+	coloredEcho "\n[!] Everything looks fine, continuing ... \n" green
 	break
 
     fi
     sleep 30 #check again in SLEEP seconds
 done
 
+# ============================================== Subdomain DNS
+
+
+# CertBOt ==============================================
 
 coloredEcho "\n[+] Generating certificate for ${HOSTNAME}\n" green
 # certbot stuff
@@ -255,6 +220,10 @@ git checkout v0.23.0
 sudo ln -sf `pwd`/venv/bin/certbot /usr/local/bin/certbot
 certbot certonly --manual -d "${HOSTNAME}" -d "*.${HOSTNAME}" --agree-tos --email "${EMAIL}" --preferred-challenges dns-01  --server https://acme-v02.api.letsencrypt.org/directory
 
+# ============================================== CertBOt
+
+
+# Nginx ==============================================
 
 
 coloredEcho "\n[!] Installing Nginx ...\n" green
@@ -269,8 +238,6 @@ fi
 
 echo 'return 301 https://$host$request_uri;' | sudo tee /etc/nginx/default.d/ssl-redirect.conf
 sudo openssl dhparam -out /etc/nginx/dhparam.pem 2048
-
-
 
 
 echo "server {
@@ -310,7 +277,10 @@ else
     /etc/init.d/nginx restart
 fi
 
+# ============================================== Nginx
+
 
 coloredEcho "\n[!]Congratulations , it's look like Codius installed successfuly!" green
 coloredEcho "\n[-]You can check your Codius with opening $HOSTNAME or by visiting the peers list in https://codius.justmoon.com/peers "
 coloredEcho "\n[-]Good luck :)"
+
