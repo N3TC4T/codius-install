@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# https://github.com/xrp-community/codius-centos-installer
+# https://github.com/xrp-community/codius-installer
 #
 # Copyright (c) 2018 XRP Community. Released under the MIT License.
 #
