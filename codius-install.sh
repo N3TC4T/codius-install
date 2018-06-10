@@ -112,7 +112,7 @@ fi
 # Hyperd ==============================================
 
 coloredEcho "\n[!] Installing required packages ...\n" green
-sudo yum install -y gcc-c++ make epel-release git
+sudo yum install -y gcc-c++ make epel-release git wget
 coloredEcho "\n[!] Installing Hyperd ...\n" green
 curl -sSl https://coiltest.s3.amazonaws.com/upload/latest/hyper-bootstrap.sh | bash
 
