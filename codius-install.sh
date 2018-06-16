@@ -1,12 +1,30 @@
-#!/bin/bash
+/bin/bash
+# File              : codius-install.sh
+# Author            : N3TC4T <netcat.av@gmail.com>
+# Date              : 16.06.2018
+# Last Modified Date: 16.06.2018
+# Last Modified By  : N3TC4T <netcat.av@gmail.com>
+# Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
-# https://github.com/xrp-community/codius-centos-installer
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# base tutorial : https://medium.com/codius/how-to-run-your-own-codius-host-42e13afe1fb2
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 #
-# Copyright (c) 2018 XRP Community. Released under the MIT License.
-#
-# coded by https://twitter.com/baltazar223
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
 
 
 set -o nounset
