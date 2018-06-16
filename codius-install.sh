@@ -1,4 +1,4 @@
-/bin/bash
+#!/bin/bash
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
