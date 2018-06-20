@@ -57,7 +57,7 @@ RESET=`tput sgr0`
 #Error Message#Error Message
 ERR_ROOT_PRIVILEGE_REQUIRED=(10 "This install script need root privilege, please retry use 'sudo' or root user!")
 ERR_NOT_SUPPORT_PLATFORM=(20 "Sorry, Hyperd only support x86_64 platform!")
-ERR_NOT_SUPPORT_DISTRO=(21 "Sorry, The insaller only support ubuntu/centos/ now!")
+ERR_NOT_SUPPORT_DISTRO=(21 "Sorry, The installer only support ubuntu/centos/ now!")
 ERR_NOT_PUBLIC_IP=(11 "You need an public IP to run Codius!")
 ERR_NOT_SUPPORT_DISTRO_VERSION=(22)
 ERR_SCRIPT_NO_NEW_VERSION=(80 "You are using the newest codius installer\n")
