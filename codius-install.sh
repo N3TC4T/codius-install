@@ -235,6 +235,12 @@ check_os_distro() {
       7) LSB_CODE="wheezy";;
     esac
   fi
+
+  if [[ "${LSB_DISTRO}" != centos ]]; then
+    show_message error "${ERR_NOT_SUPPORT_DISTRO[1]}"
+    exit ${ERR_NOT_SUPPORT_DISTRO[0]}
+  fi
+
   case "${LSB_DISTRO}" in
     ubuntu|debian)
       if [[ "${LSB_DISTRO}" == "ubuntu" ]]
