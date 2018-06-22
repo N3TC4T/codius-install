@@ -379,9 +379,9 @@ install()
   show_message info "[*] Starting Hyperd... "
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
-    _exec "systemctl enable hyperd"
+    _exec "systemctl enable hyperd; systemctl restart hyperd"
   else
-    _exec "service hyperd enable"
+    _exec "service hyperd enable; service hyperd restart"
   fi
 
 
