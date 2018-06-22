@@ -327,7 +327,7 @@ install()
 
   while true; do
     read -p "Wallet Secret: " -e SECRET
-    if [[ -z "$SECRET" ]] || ! [[ "$SECRET" =~ ^s[a-zA-Z0-9]{28}+$ ]] ; then
+    if [[ -z "$SECRET" ]] || ! [[ "$SECRET" =~ ^s[a-zA-Z0-9]{28,}+$ ]] ; then
       show_message error "Invalid Secret entered, try again... "
     else
       break
@@ -362,9 +362,9 @@ install()
   elif [[ "${LSB_DISTRO}" == "centos" ]] && [[ "${CMAJOR}" == "6" ]];then
     _exec "rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm ; yum install -y gcc-c++ make epel-release git"
   elif [[ "${LSB_DISTRO}" == "ubuntu" ]];then
-    _exec "apt-get install -y software-properties-common ; add-apt-repository ppa:certbot/certbot ; apt-get install -y build-essential git qemu-kvm libvirt0 aufs-uti"
+    _exec "apt-get install -y software-properties-common ; add-apt-repository ppa:certbot/certbot ; apt-get install -y build-essential git qemu-kvm libvirt0 aufs-tools"
   elif [[ "${LSB_DISTRO}" == "debian" ]];then
-    _exec "apt-get update ; apt-get install -y build-essential git qemu-kvm libvirt0 aufs-uti"
+    _exec "apt-get update ; apt-get install -y build-essential git qemu-kvm libvirt0 aufs-tools"
   fi
 
 
@@ -376,9 +376,11 @@ install()
 
   _exec bash /tmp/hyper-bootstrap.sh
 
+  show_message info "[*] Starting Hyperd... "
+
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
     _exec "systemctl enable hyperd"
-  else 
+  else
     _exec "service hyperd enable"
   fi
 
@@ -440,7 +442,7 @@ WantedBy=multi-user.target' > /etc/systemd/system/moneyd-xrp.service
 
 
   # Configuring moneyd and start service
-  if [ -f ~/.moneyd.json ]; then 
+  if [ -f ~/.moneyd.json ]; then
     show_message warn "Old ~/.moneyd.json config file found , backup to ~/.moneyd.json.back"
     ${SUDO} mv ~/.moneyd.json ~/.moneyd.json.back
   fi
@@ -508,13 +510,12 @@ EOF
   read -n1 -r -p "Press any key to continue..."
 
   while true; do
-      ping -c 1 $HOSTNAME >/dev/null 2>&1
-      if [ $? -ne 0 ] ; then #if ping exits nonzero...
-	  show_message warn "[!] It's look like the host $HOSTNAME is not avalibale yet , waiting 30s ... "
-      else
-	  break
-      fi
-      sleep 30 #check again in SLEEP seconds
+    if ping -c1 -W1 $HOSTNAME &> /dev/null; then
+      break
+    else
+      show_message warn "It's look like the $HOSTNAME cannot be resolved yet , waiting 30s ... "
+    fi
+    sleep 30 #check again in SLEEP seconds
   done
 
   # ============================================== Subdomain DNS
@@ -641,7 +642,8 @@ server {
 
 
   new_line
-  show_message warn "If you have problem in opening the Codius it's reecommended to reboot your system in order to complate the installation proccess ..."
+  show_message warn "If you have problem in opening the Codius it's recommended to reboot your system in order to complate the installation proccess ..."
+  new_line
   read -p "Reboot now? [y/N]: " -e REBOOT
 
   if [[ "$REBOOT" = 'y' || "$REBOOT" = 'Y' ]]; then
@@ -701,7 +703,7 @@ clean(){
   if [[ "${LSB_DISTRO}" == "centos"  ]] || [[ "${LSB_DISTRO}" == "fedora"  ]] ;then
       ${SUDO} yum remove nodejs hyperd nginx qemu-hyper hyperstart hyper-container certbot
   elif [[ "${LSB_DISTRO}" == "ubuntu" ]] || [[ "${LSB_DISTRO}" == "debian" ]] ;then
-      for i in nodejs hyperd nginx qemu-kvm libvirt0 hyperstart hypercontainer certbot; do ${SUDO} apt-get -y remove $i || true ;done
+      for i in nodejs hyperd nginx qemu-kvm libvirt0 hyperstart hypercontainer certbot aufs-tools; do ${SUDO} apt-get -y remove $i || true ;done
       ${SUDO} apt -y autoremove || true
   fi
 
@@ -722,6 +724,11 @@ clean(){
       ${SUDO} rm -rf $d
     fi
   done
+
+
+  if [[ "${INIT_SYSTEM}" == "systemd" ]];then
+      ${SUDO} systemctl daemon-reload
+  fi
 
   printf "\n\n"
   show_message done "[*] Everything cleaned successfuly!"
@@ -784,7 +791,7 @@ renew()
 
     if [[ "${INIT_SYSTEM}" == "systemd" ]];then
       _exec "systemctl restart nginx"
-    else 
+    else
       _exec "service nginx restart"
     fi
 
