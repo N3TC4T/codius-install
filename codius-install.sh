@@ -2,7 +2,7 @@
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
-# Last Modified Date: 21.06.2018
+# Last Modified Date: 22.06.2018
 # Last Modified By  : N3TC4T <netcat.av@gmail.com>
 # Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
@@ -33,7 +33,7 @@ LOG_OUTPUT="/tmp/${0##*/}$(date +%Y-%m-%d.%H-%M)"
 CURRENT_USER="$(id -un 2>/dev/null || true)"
 BASE_DIR=$(cd "$(dirname "$0")"; pwd); cd ${BASE_DIR}
 ########## Hyperd ##########
-HYPERD_URL="https://coiltest.s3.amazonaws.com/upload/latest/hyper-bootstrap.sh"
+HYPERD_URL="https://codius-hyper-install.s3.amazonaws.com/hyper-bootstrap.sh"
 ########## Nodejs ##########
 NODEJS_RPM_URL="https://rpm.nodesource.com/setup_10.x"
 NODEJS_DEB_URL="https://deb.nodesource.com/setup_10.x"
@@ -41,8 +41,7 @@ YARN_URL="https://yarnpkg.com/install.sh"
 ########## Certbot ##########
 CERTBOT_AUTO_URL="https://dl.eff.org/certbot-auto"
 ########## Constant ##########
-# SUPPORT_DISTRO=(debian ubuntu fedora centos)
-SUPPORT_DISTRO=(centos)
+SUPPORT_DISTRO=(debian ubuntu fedora centos)
 UBUNTU_CODE=(trusty utopic vivid wily xenial)
 DEBIAN_CODE=(jessie wheezy)
 CENTOS_VER=(6 7)
@@ -234,11 +233,6 @@ check_os_distro() {
       8) LSB_CODE="jessie";;
       7) LSB_CODE="wheezy";;
     esac
-  fi
-
-  if [[ "${LSB_DISTRO}" != centos ]]; then
-    show_message error "${ERR_NOT_SUPPORT_DISTRO[1]}"
-    exit ${ERR_NOT_SUPPORT_DISTRO[0]}
   fi
 
   case "${LSB_DISTRO}" in
