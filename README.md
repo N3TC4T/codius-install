@@ -12,4 +12,5 @@ Run the script and follow the assistant:
 
 ### Donations
 
-If you want to show your appreciation, you can donate via XRP to rD1ioePTv7P1jgELM3tDkDU1LJqTEwuwo :)
+If you want to show your appreciation, you can donate via XRP to
+`rD1ioePTv7P1jgELM3tDkDU1LJqTEwuwo` :)
