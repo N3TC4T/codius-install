@@ -362,9 +362,9 @@ install()
   elif [[ "${LSB_DISTRO}" == "centos" ]] && [[ "${CMAJOR}" == "6" ]];then
     _exec "rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm ; yum install -y gcc-c++ make epel-release git"
   elif [[ "${LSB_DISTRO}" == "ubuntu" ]];then
-    _exec "apt-get install -y software-properties-common ; add-apt-repository ppa:certbot/certbot ; apt-get install -y build-essential git qemu-kvm libvirt0"
+    _exec "apt-get install -y software-properties-common ; add-apt-repository ppa:certbot/certbot ; apt-get install -y build-essential git qemu-kvm libvirt0 aufs-uti"
   elif [[ "${LSB_DISTRO}" == "debian" ]];then
-    _exec "apt-get update ; apt-get install -y build-essential git qemu-kvm libvirt0"
+    _exec "apt-get update ; apt-get install -y build-essential git qemu-kvm libvirt0 aufs-uti"
   fi
 
 
