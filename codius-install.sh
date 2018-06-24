@@ -2,7 +2,7 @@
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
-# Last Modified Date: 22.06.2018
+# Last Modified Date: 25.06.2018
 # Last Modified By  : N3TC4T <netcat.av@gmail.com>
 # Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
@@ -622,7 +622,7 @@ server {
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
     _exec "systemctl enable nginx ; systemctl restart nginx"
-  else 
+  else
     _exec "service nginx enable ; service nginx restart"
   fi
 
@@ -658,33 +658,91 @@ server {
 
 ################### UPDATE ###########################
 
-update() {
-  INSTALLER_URL="https://raw.githubusercontent.com/xrp-community/codius-install/master/codius-install.sh"
-  LATEST_FILE=$(curl "$INSTALLER_URL" 2>/dev/null) || { printf '%s\n' 'Unable to check for updates.'; curlFailed=1; }
-  THIS_MOD=$(grep -m1 '# Last Modified Date: ' $0)
-  LASTED_MOD=$(grep -m1 '# Last Modified Date: ' <<<"$LATEST_FILE")
+update()
+{
+  check_deps_initsystem
+  # We need to check if moneyd installed with one of NPM or Yarn
 
-  if [[ "$THIS_MOD" != "$LASTED_MOD" ]] &&  [[ ! -n "$curlFailed" ]]; then
-    show_message info "[!] An updateis available... "
-    show_message info "[+] Updating now.\n"
-    tmpfile=$(mktemp)
-    chmod +x "$tmpfile"
-    cat <<<"$LATEST_FILE" > "$tmpfile"
-    mv "$tmpfile" "$0"
-    show_message done "\n[-] Installer successfuly updated to the latest version , please restart the script to continue.\n"
-    exit
-  else
-    show_message error "${ERR_SCRIPT_NO_NEW_VERSION[1]}" && exit ${ERR_SCRIPT_NO_NEW_VERSION[0]}
-    show_message info "[!] You are using the latest version of script!\n\n"
-    exit
+  local PACKAGES=(moneyd codiusd)
+  local PACKAGE_MANAGER=
+
+  show_message info "[-] Checking packages availability ..."
+  for package in "${PACKAGES[@]}"
+  do
+    local FOUND_IN_YARN=0
+    local FOUND_IN_NPM=0
+    # check if moneyd installed with NPM
+    npm list --depth 0 --global "$package" > /dev/null 2>&1 && { local FOUND_IN_NPM=1; }
+    # check in Yarn
+    yarn global list --depth=0 2>&1 | grep -q "$package" && { local FOUND_IN_YARN=1; }
+
+    if [ $FOUND_IN_YARN == 0 ] && [ $FOUND_IN_NPM == 0 ]; then
+      show_message error "$package is not installed with YARN or NPM !"
+      PACKAGES=( "${PACKAGES[@]/$package}" )
+    fi
+
+    if ! [[ "$PACKAGE_MANAGER" ]]; then
+      if [ $FOUND_IN_YARN == 1 ]; then
+        PACKAGE_MANAGER='yarn'
+      elif [ $FOUND_IN_NPM == 1 ]; then
+        PACKAGE_MANAGER='npm'
+      fi
+    fi
+
+
+  done
+
+  if [ -z "$PACKAGES" ]; then
+    show_message error "No package to update!" && exit 0
   fi
+
+  if [ "$PACKAGE_MANAGER" == "npm" ]; then
+    new_line
+    show_message debug "Checking $(echo "${PACKAGES[@]}") version using NPM ..."
+    for package in $PACKAGES
+    do
+      output=$(npm -g outdated --parseable --depth=0 | grep "$package" || :)
+      if [[ $output ]] ; then
+        local from_version=$( echo $output | cut -d: -f3)
+        local to_version=$( echo $output | cut -d: -f2)
+        show_message info "[+] Updating ${package} from ${from_version} to ${to_version}... "
+        _exec npm update -g $package unsafe-perm
+      else
+        show_message info "[+] ${package} already installed latest version."
+      fi
+    done
+  else
+    show_message debug "Updating $(echo "${PACKAGES[@]}") using YARN ..."
+    ${SUDO} yarn global upgrade-interactive moneyd codiusd --latest
+  fi
+
+  printf "\n\n"
+  read -p "[?] Restarting Moneyd and Codiusd services ? [y/N]: " -e RESTART_SERVICE
+
+  if [[ "$RESTART_SERVICE" = 'y' || "$RESTART_SERVICE" = 'Y' ]]; then
+      for service in moneyd-xrp codiusd
+      do
+        show_message info "[-] Restarting ${service} ..."
+        if [[ "${INIT_SYSTEM}" == "systemd" ]];then
+          ${SUDO} systemctl restart $service
+        else
+          ${SUDO} service $service restart
+        fi
+      done
+  fi
+  printf "\n\n"
+  show_message done "[!] Everything Done!"
+
+  printf "\n\n"
+
+  exit
 
 }
 
 ################### CLEANUP ###########################
 
 clean(){
-  
+
   check_user
   check_os_platform
   check_os_distro
@@ -942,6 +1000,34 @@ debug(){
 
 }
 
+
+################### CHECK FOR SCRIPT UPDATES ###########################
+
+check_script_update() {
+  INSTALLER_URL="https://raw.githubusercontent.com/xrp-community/codius-install/master/codius-install.sh"
+  LATEST_FILE=$(curl "$INSTALLER_URL" 2>/dev/null) || { printf '%s\n' 'Unable to check for updates.'; curlFailed=1; }
+  THIS_MOD=$(grep -m1 '# Last Modified Date: ' $0)
+  LASTED_MOD=$(grep -m1 '# Last Modified Date: ' <<<"$LATEST_FILE")
+
+  if [[ "$THIS_MOD" != "$LASTED_MOD" ]] &&  [[ ! -n "$curlFailed" ]]; then
+    show_message info "[!] An update is available For the script... "
+    read -p "Update Now ? [y/N]: " -e UPDATE
+
+    if [[ "$UPDATE" = 'y' || "$UPDATE" = 'Y' ]]; then
+      show_message info "[+] Updating now.\n"
+      tmpfile=$(mktemp)
+      chmod +x "$tmpfile"
+      cat <<<"$LATEST_FILE" > "$tmpfile"
+      mv "$tmpfile" "$0"
+      show_message done "\n[-] Installer successfuly updated to the latest version , please restart the script to continue.\n"
+      exit
+    fi
+  fi
+
+  new_line
+
+}
+
 ################### MAIN ###########################
 
 while :
@@ -949,13 +1035,15 @@ do
   clear
   display_header
 
-  # check for update 
+  # check for script Update at startup
+  check_script_update
+
   echo "What do you want to do?"
                   echo "   1) Install and run Codius in your system"
                   echo "   2) Check your system for codius errors"
                   echo "   3) Check for certificate status and renew"
                   echo "   4) Cleanup the codius from the server"
-                  echo "   5) Update the installer script to the lastest version"
+                  echo "   5) Update Moneyd & Codius to the lastest version"
                   echo "   6) Exit"
   read -p "Select an option [1-6]: " option
 
@@ -964,8 +1052,8 @@ do
     2)debug;;
     3)renew;;
     4)clean;;
-    4)update;;
-    5)exit;;
+    5)update;;
+    6)exit;;
   esac
 done
 
