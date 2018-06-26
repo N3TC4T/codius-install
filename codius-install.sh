@@ -2,7 +2,7 @@
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
-# Last Modified Date: 25.06.2018
+# Last Modified Date: 27.06.2018
 # Last Modified By  : N3TC4T <netcat.av@gmail.com>
 # Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
@@ -28,10 +28,12 @@ set -e
 
 ########## Variable ##########
 SUDO=""
+BASH_C="bash -c"
 SLEEP_SEC=10
-LOG_OUTPUT="/tmp/${0##*/}$(date +%Y-%m-%d.%H-%M)" 
+LOG_OUTPUT="/tmp/${0##*/}$(date +%Y-%m-%d.%H-%M)"
 CURRENT_USER="$(id -un 2>/dev/null || true)"
 BASE_DIR=$(cd "$(dirname "$0")"; pwd); cd ${BASE_DIR}
+INSTALLER_URL="https://raw.githubusercontent.com/xrp-community/codius-install/master/codius-install.sh"
 ########## Hyperd ##########
 HYPERD_URL="https://codius-hyper-install.s3.amazonaws.com/hyper-bootstrap.sh"
 ########## Nodejs ##########
@@ -57,8 +59,9 @@ RESET=`tput sgr0`
 #Error Message#Error Message
 ERR_ROOT_PRIVILEGE_REQUIRED=(10 "This install script need root privilege, please retry use 'sudo' or root user!")
 ERR_NOT_SUPPORT_PLATFORM=(20 "Sorry, Hyperd only support x86_64 platform!")
-ERR_NOT_SUPPORT_DISTRO=(21 "Sorry, The installer only support centos/ubuntu/debian now.")
+ERR_NOT_SUPPORT_DISTRO=(21 "Sorry, The installer only support centos/ubuntu/debian/fedora now.")
 ERR_NOT_PUBLIC_IP=(11 "You need an public IP to run Codius!")
+ERR_MONEYD_CONFIGURE=(12 "Moneyd Cannot config your account with entered secret , please check your secret and try again .")
 ERR_NOT_SUPPORT_DISTRO_VERSION=(22)
 ERR_SCRIPT_NO_NEW_VERSION=(80 "You are using the newest codius installer\n")
 ERR_NO_CERTBOT_INSTALLED=(81 "Certbot is not installed!\n")
@@ -423,7 +426,7 @@ install()
   # _exec yum install -y https://s3.us-east-2.amazonaws.com/codius-bucket/moneyd-xrp-4.0.0-1.x86_64.rpm
   _exec yarn global add moneyd moneyd-uplink-xrp
 
-  ${SUDO} echo '[Unit]
+  ${SUDO} ${BASH_C} 'echo "[Unit]
 Description=ILP provider using XRP payment channels
 After=network.target nss-lookup.target
 
@@ -438,16 +441,25 @@ User=root
 Group=root
 
 [Install]
-WantedBy=multi-user.target' > /etc/systemd/system/moneyd-xrp.service
+WantedBy=multi-user.target" > /etc/systemd/system/moneyd-xrp.service'
 
 
   # Configuring moneyd and start service
   if [ -f ~/.moneyd.json ]; then
-    show_message warn "Old ~/.moneyd.json config file found , backup to ~/.moneyd.json.back"
+    show_message warn "old ~/.moneyd.json config file found , backup to ~/.moneyd.json.back"
     ${SUDO} mv ~/.moneyd.json ~/.moneyd.json.back
   fi
 
-  echo -ne "$SECRET\n" | /usr/local/bin/moneyd xrp:configure > /dev/null 2>&1
+
+  # Todo: need to check
+  # https://github.com/xrp-community/codius-install/issues/4
+
+  echo -ne "$SECRET\n" | ${SUDO} $(which moneyd) xrp:configure > /dev/null 2>&1 || { show_message error "${ERR_MONEYD_CONFIGURE[1]}" ; exit "${ERR_MONEYD_CONFIGURE[0]}" ; }
+
+  # this will generate an random channel name
+  #UUID_CHANNEL=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+  #sed -i "s/btp+wss:\/\//&${UUID_CHANNEL}/g" ~/.moneyd.json
+
 
   show_message info "[*] Starting Moneyd... "
 
@@ -466,7 +478,7 @@ WantedBy=multi-user.target' > /etc/systemd/system/moneyd-xrp.service
   show_message info "[+] Installing Codius... "
   _exec yarn global add codiusd
 
-  ${SUDO} echo "[Unit]
+  ${SUDO} ${BASH_C} 'echo "[Unit]
 Description=Codiusd
 After=network.target nss-lookup.target
 [Service]
@@ -474,6 +486,7 @@ ExecStart=/usr/local/bin/codiusd
 Environment="DEBUG=*"
 Environment="CODIUS_PUBLIC_URI=https://$HOSTNAME"
 Environment="CODIUS_XRP_PER_MONTH=10"
+Environment="CODIUS_ADDITIONAL_HOST_INFO=true"
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
@@ -481,13 +494,13 @@ SyslogIdentifier=codiusd
 User=root
 Group=root
 [Install]
-WantedBy=multi-user.target" > /etc/systemd/system/codiusd.service
+WantedBy=multi-user.target" > /etc/systemd/system/codiusd.service'
 
-  show_message info "[*] Starting Codius... "
+  show_message info "[*] Starting Codius... "
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
     _exec "systemctl enable codiusd ; systemctl restart codiusd"
-  else 
+  else
     _exec "service codiusd enable ; service codiusd restart"
   fi
 
@@ -587,7 +600,7 @@ EOF
 	  ${SUDO} mkdir /etc/nginx/conf.d
   fi
 
-  ${SUDO} echo "
+  ${SUDO} ${BASH_C} 'echo "
 server {
     listen 443 ssl;
 
@@ -606,17 +619,17 @@ server {
     ssl_stapling_verify on;
     resolver 1.1.1.1 1.0.0.1 valid=300s;
     resolver_timeout 5s;
-    add_header Strict-Transport-Security 'max-age=63072000; includeSubDomains; preload';
+    add_header Strict-Transport-Security '\''max-age=63072000; includeSubDomains; preload'\'';
     add_header X-Frame-Options DENY;
     add_header X-Content-Type-Options nosniff;
-    add_header X-XSS-Protection '1; mode=block';
+    add_header X-XSS-Protection '\''1; mode=block'\'';
 
     location / {
       proxy_pass http://127.0.0.1:3000;
       proxy_set_header Host \$host;
       proxy_set_header X-Forwarded-For \$remote_addr;
     }
-}" > /etc/nginx/conf.d/codius.conf
+}" > /etc/nginx/conf.d/codius.conf'
 
   show_message info "[*] Starting Nginx... "
 
@@ -713,6 +726,9 @@ update()
     done
   else
     show_message debug "Updating $(echo "${PACKAGES[@]}") using YARN ..."
+    new_line
+    show_message info "[!] please press SPACE on your keyboard to active packages to upgrade ."
+    new_line
     ${SUDO} yarn global upgrade-interactive moneyd codiusd --latest
   fi
 
@@ -759,7 +775,7 @@ clean(){
   fi
 
   if [[ "${LSB_DISTRO}" == "centos"  ]] || [[ "${LSB_DISTRO}" == "fedora"  ]] ;then
-      ${SUDO} yum remove nodejs hyperd nginx qemu-hyper hyperstart hyper-container certbot
+      ${SUDO} yum remove -y nodejs hyperd nginx qemu-hyper hyperstart hyper-container certbot
   elif [[ "${LSB_DISTRO}" == "ubuntu" ]] || [[ "${LSB_DISTRO}" == "debian" ]] ;then
       for i in nodejs hyperd nginx qemu-kvm libvirt0 hyperstart hypercontainer certbot aufs-tools; do ${SUDO} apt-get -y remove $i || true ;done
       ${SUDO} apt -y autoremove || true
@@ -778,7 +794,7 @@ clean(){
 
   for d in "${dirs_to_remove[@]}"
   do
-    if [ -f "$d" ]; then 
+    if [ -d "$d" ]; then 
       ${SUDO} rm -rf $d
     fi
   done
@@ -1004,7 +1020,6 @@ debug(){
 ################### CHECK FOR SCRIPT UPDATES ###########################
 
 check_script_update() {
-  INSTALLER_URL="https://raw.githubusercontent.com/xrp-community/codius-install/master/codius-install.sh"
   LATEST_FILE=$(curl "$INSTALLER_URL" 2>/dev/null) || { printf '%s\n' 'Unable to check for updates.'; curlFailed=1; }
   THIS_MOD=$(grep -m1 '# Last Modified Date: ' $0)
   LASTED_MOD=$(grep -m1 '# Last Modified Date: ' <<<"$LATEST_FILE")
