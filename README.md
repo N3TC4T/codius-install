@@ -8,7 +8,7 @@ Run the script and follow the assistant:
 
 `wget https://raw.githubusercontent.com/xrp-community/codius-install/master/codius-install.sh -O codius-install.sh && bash codius-install.sh`
 ### ScreenShot
-![screen](https://user-images.githubusercontent.com/6250203/41682829-180b4234-74ee-11e8-931b-ba0d184f2087.png)
+![screen](https://user-images.githubusercontent.com/6250203/41824308-780a9170-7823-11e8-8611-642b84895ccb.png)
 
 ### Donations
 
