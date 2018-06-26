@@ -706,7 +706,7 @@ update()
         local from_version=$( echo $output | cut -d: -f3)
         local to_version=$( echo $output | cut -d: -f2)
         show_message info "[+] Updating ${package} from ${from_version} to ${to_version}... "
-        _exec npm update -g $package unsafe-perm
+        _exec npm update -g $package --unsafe-perm
       else
         show_message info "[+] ${package} already installed latest version."
       fi
