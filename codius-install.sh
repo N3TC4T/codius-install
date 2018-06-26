@@ -891,7 +891,7 @@ debug(){
   if [[ $status ]]; then
     validate=( $status )
     if [ ${validate[-2]} == "200" ]; then
-        show_message success "[*] looks likes Codius is running property in your host ."
+        show_message success "[*] looks likes Codius is running properly in your host ."
         new_line
         read -p "Continue Anyway ? [y/N]: " -e CONTINUE
 
