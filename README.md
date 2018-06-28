@@ -14,3 +14,8 @@ Run the script and follow the assistant:
 
 If you want to show your appreciation, you can donate via XRP to
 `rD1ioePTv7P1jgELM3tDkDU1LJqTEwuwo` :)
+
+### Contact
+
+[![twitter](https://user-images.githubusercontent.com/6250203/42041517-5435904c-7b07-11e8-906b-39a5f763a406.png)]
+[Twitter](https://twitter.com/baltazar223) @baltazar223
