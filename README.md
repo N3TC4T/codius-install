@@ -17,6 +17,5 @@ If you want to show your appreciation, you can donate via XRP to
 
 ### Contact
 
-<img src="https://user-images.githubusercontent.com/6250203/42041517-5435904c-7b07-11e8-906b-39a5f763a406.png" data-canonical-src="https://user-images.githubusercontent.com/6250203/42041517-5435904c-7b07-11e8-906b-39a5f763a406.png" width="80" height="80" />
-
-[@baltazar223](https://twitter.com/baltazar223) 
+[<img src="https://user-images.githubusercontent.com/6250203/42041517-5435904c-7b07-11e8-906b-39a5f763a406.png" data-canonical-src="https://twitter.com/baltazar223" width="80" height="80" />
+](https://twitter.com/baltazar223) 
