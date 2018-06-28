@@ -2,7 +2,7 @@
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
-# Last Modified Date: 27.06.2018
+# Last Modified Date: 28.06.2018
 # Last Modified By  : N3TC4T <netcat.av@gmail.com>
 # Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
@@ -382,7 +382,7 @@ install()
   show_message info "[*] Starting Hyperd... "
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
-    _exec "systemctl enable hyperd; systemctl restart hyperd"
+    _exec "systemctl daemon-reload; systemctl enable hyperd; systemctl restart hyperd"
   else
     _exec "service hyperd enable; service hyperd restart"
   fi
@@ -460,11 +460,14 @@ WantedBy=multi-user.target" > /etc/systemd/system/moneyd-xrp.service'
   #UUID_CHANNEL=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
   #sed -i "s/btp+wss:\/\//&${UUID_CHANNEL}/g" ~/.moneyd.json
 
+  # change lisp.openafricanetwork.org as it's don't have fund to create channel
+  sed -i 's/lisp.openafricanetwork.org/client.scyl.la/g' ~/.moneyd.json
+
 
   show_message info "[*] Starting Moneyd... "
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
-    _exec "systemctl enable moneyd-xrp ; systemctl restart moneyd-xrp"
+    _exec "systemctl daemon-reload; systemctl enable moneyd-xrp ; systemctl restart moneyd-xrp"
   else
     _exec "service moneyd-xrp enable; service moneyd-xrp restart"
   fi
@@ -499,7 +502,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/codiusd.service'
   show_message info "[*] Starting Codius... "
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
-    _exec "systemctl enable codiusd ; systemctl restart codiusd"
+    _exec "sudo systemctl daemon-reload; systemctl enable codiusd ; systemctl restart codiusd"
   else
     _exec "service codiusd enable ; service codiusd restart"
   fi
@@ -634,7 +637,7 @@ server {
   show_message info "[*] Starting Nginx... "
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
-    _exec "systemctl enable nginx ; systemctl restart nginx"
+    _exec "systemctl daemon-reload; systemctl enable nginx ; systemctl restart nginx"
   else
     _exec "service nginx enable ; service nginx restart"
   fi
@@ -782,7 +785,7 @@ clean(){
   fi
 
 
-  files_to_remove=("$HOME/.moneyd.json" "$HOME/.moneyd.json.back" "/etc/systemd/system/moneyd-xrp.service" "/etc/systemd/system/codiusd.service" , "/usr/bin/certbot")
+  files_to_remove=("$HOME/.moneyd.json" "$HOME/.moneyd.json.back" "/etc/systemd/system/moneyd-xrp.service" "/etc/systemd/system/codiusd.service" , "/usr/bin/certbot", "/etc/nginx/conf.d/codius.conf")
   dirs_to_remove=("$HOME/.yarn" "/etc/letsencrypt")
 
   for f in "${files_to_remove[@]}"
