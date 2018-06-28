@@ -502,7 +502,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/codiusd.service'
   show_message info "[*] Starting Codius... "
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
-    _exec "sudo systemctl daemon-reload; systemctl enable codiusd ; systemctl restart codiusd"
+    _exec "systemctl daemon-reload; systemctl enable codiusd ; systemctl restart codiusd"
   else
     _exec "service codiusd enable ; service codiusd restart"
   fi
