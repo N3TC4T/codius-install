@@ -2,7 +2,7 @@
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
-# Last Modified Date: 28.06.2018
+# Last Modified Date: 05.07.2018
 # Last Modified By  : N3TC4T <netcat.av@gmail.com>
 # Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
@@ -732,7 +732,7 @@ update()
     new_line
     show_message info "[!] please press SPACE on your keyboard to active packages to upgrade ."
     new_line
-    ${SUDO} yarn global upgrade-interactive moneyd codiusd --latest
+    ${SUDO} yarn global add moneyd@latest codiusd@latest --force
   fi
 
   printf "\n\n"
