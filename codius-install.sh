@@ -2,7 +2,7 @@
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
-# Last Modified Date: 05.07.2018
+# Last Modified Date: 11.07.2018
 # Last Modified By  : N3TC4T <netcat.av@gmail.com>
 # Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
@@ -61,7 +61,7 @@ ERR_ROOT_PRIVILEGE_REQUIRED=(10 "This install script need root privilege, please
 ERR_NOT_SUPPORT_PLATFORM=(20 "Sorry, Hyperd only support x86_64 platform!")
 ERR_NOT_SUPPORT_DISTRO=(21 "Sorry, The installer only support centos/ubuntu/debian/fedora now.")
 ERR_NOT_PUBLIC_IP=(11 "You need an public IP to run Codius!")
-ERR_MONEYD_CONFIGURE=(12 "Moneyd Cannot config your account with entered secret , please check your secret and try again .")
+ERR_MONEYD_CONFIGURE=(12 "There is an error on configuring moneyd , please check you entered correct secret and your account have at least 35 XRP .")
 ERR_NOT_SUPPORT_DISTRO_VERSION=(22)
 ERR_SCRIPT_NO_NEW_VERSION=(80 "You are using the newest codius installer\n")
 ERR_NO_CERTBOT_INSTALLED=(81 "Certbot is not installed!\n")
