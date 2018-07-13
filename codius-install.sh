@@ -424,14 +424,14 @@ install()
 
   show_message info "[+] Installing Moneyd... "
   # _exec yum install -y https://s3.us-east-2.amazonaws.com/codius-bucket/moneyd-xrp-4.0.0-1.x86_64.rpm
-  _exec yarn global add moneyd moneyd-uplink-xrp
+  _exec npm install -g moneyd moneyd-uplink-xrp --unsafe-perm
 
   ${SUDO} ${BASH_C} 'echo "[Unit]
 Description=ILP provider using XRP payment channels
 After=network.target nss-lookup.target
 
 [Service]
-ExecStart=/usr/local/bin/moneyd xrp:start
+ExecStart=/usr/bin/moneyd xrp:start
 Environment="DEBUG=*"
 Restart=always
 StandardOutput=syslog
@@ -479,13 +479,14 @@ WantedBy=multi-user.target" > /etc/systemd/system/moneyd-xrp.service'
   # Codius ==============================================
 
   show_message info "[+] Installing Codius... "
-  _exec yarn global add codiusd
+  _exec npm install -g codiusd --unsafe-perm
 
   ${SUDO} ${BASH_C} 'echo "[Unit]
 Description=Codiusd
 After=network.target nss-lookup.target
 [Service]
-ExecStart=/usr/local/bin/codiusd
+ExecStart=/usr/bin/npm start
+WorkingDirectory=/usr/lib/node_modules/codiusd
 Environment="DEBUG=*"
 Environment="CODIUS_PUBLIC_URI=https://$HOSTNAME"
 Environment="CODIUS_XRP_PER_MONTH=10"
@@ -789,9 +790,15 @@ clean(){
       ${SUDO} apt -y autoremove || true
   fi
 
+  # remove packages from yarn
+  ${SUDO} yarn global remove moneyd codiusd moneyd-uplink-xrp
+
+  # npm uninstall -g
+  ${SUDO} npm uninstall -g moneyd codiusd moneyd-uplink-xrp --unsafe-perm
+
 
   files_to_remove=("$HOME/.moneyd.json" "$HOME/.moneyd.json.back" "/etc/systemd/system/moneyd-xrp.service" "/etc/systemd/system/codiusd.service" , "/usr/bin/certbot", "/etc/nginx/conf.d/codius.conf")
-  dirs_to_remove=("$HOME/.yarn" "/etc/letsencrypt")
+  dirs_to_remove=("$HOME/.yarn" "/etc/letsencrypt" "/var/lib/hyper")
 
   for f in "${files_to_remove[@]}"
   do
@@ -990,7 +997,7 @@ debug(){
       exec 3>&-
 
     eval "${SUDO} bash -c '${c}'" >>"${TMPFILE}" 2>&1  &
-    sleep 10
+    sleep 20
     exec 3>&-
   done
 
@@ -1066,7 +1073,7 @@ do
                   echo "   2) Check your system for codius errors"
                   echo "   3) Check for certificate status and renew"
                   echo "   4) Cleanup the codius from the server"
-                  echo "   5) Update Moneyd & Codius to the lastest version"
+                  echo "   5) Update Codiusd & Moneyd to the lastest version"
                   echo "   6) Exit"
   read -p "Select an option [1-6]: " option
 
