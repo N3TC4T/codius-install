@@ -783,19 +783,19 @@ clean(){
     exit 0
   fi
 
-  if [[ "${LSB_DISTRO}" == "centos"  ]] || [[ "${LSB_DISTRO}" == "fedora"  ]] ;then
-      ${SUDO} yum remove -y nodejs hyperd nginx qemu-hyper hyperstart hyper-container certbot
-  elif [[ "${LSB_DISTRO}" == "ubuntu" ]] || [[ "${LSB_DISTRO}" == "debian" ]] ;then
-      for i in nodejs hyperd nginx qemu-kvm libvirt0 hyperstart hypercontainer certbot aufs-tools; do ${SUDO} apt-get -y remove $i || true ;done
-      ${SUDO} apt -y autoremove || true
-  fi
-
   # remove packages from yarn
   ${SUDO} yarn global remove moneyd codiusd moneyd-uplink-xrp
 
   # npm uninstall -g
   ${SUDO} npm uninstall -g moneyd codiusd moneyd-uplink-xrp --unsafe-perm
 
+
+  if [[ "${LSB_DISTRO}" == "centos"  ]] || [[ "${LSB_DISTRO}" == "fedora"  ]] ;then
+      ${SUDO} yum remove -y nodejs hyperd nginx qemu-hyper hyperstart hyper-container certbot
+  elif [[ "${LSB_DISTRO}" == "ubuntu" ]] || [[ "${LSB_DISTRO}" == "debian" ]] ;then
+      for i in nodejs hyperd nginx qemu-kvm libvirt0 hyperstart hypercontainer certbot aufs-tools; do ${SUDO} apt-get -y remove $i || true ;done
+      ${SUDO} apt -y autoremove || true
+  fi
 
   files_to_remove=("$HOME/.moneyd.json" "$HOME/.moneyd.json.back" "/etc/systemd/system/moneyd-xrp.service" "/etc/systemd/system/codiusd.service" , "/usr/bin/certbot", "/etc/nginx/conf.d/codius.conf")
   dirs_to_remove=("$HOME/.yarn" "/etc/letsencrypt" "/var/lib/hyper")
@@ -809,7 +809,7 @@ clean(){
 
   for d in "${dirs_to_remove[@]}"
   do
-    if [ -d "$d" ]; then 
+    if [ -d "$d" ]; then
       ${SUDO} rm -rf $d
     fi
   done
