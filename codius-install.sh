@@ -657,7 +657,7 @@ server {
   new_line
   show_message done "[!] Congratulations , it's look like Codius installed successfuly!"
   new_line
-  show_message done "[-] You can check your Codius with opening https://$HOSTNAME/version or by visiting the peers list in https://$HOSTNAME/peers "
+  show_message done "[-] You can check your Codius by opening https://$HOSTNAME or by searching for your host at https://codiushosts.com"
   show_message done "[-] For installation log visit $LOG_OUTPUT"
   new_line
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
