@@ -685,7 +685,7 @@ update()
   check_deps_initsystem
   # We need to check if moneyd installed with one of NPM or Yarn
 
-  local PACKAGES=(moneyd codiusd)
+  local PACKAGES=(moneyd codiusd moneyd-uplink-xrp)
   local PACKAGE_MANAGER=
 
   show_message info "[-] Checking packages availability ..."
