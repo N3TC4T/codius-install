@@ -403,21 +403,6 @@ install()
     _exec "bash /tmp/nodejs_10.sh && apt-get install -y nodejs"
   fi
 
-
-
-
-  # yarn ==============================================
-
-
-  show_message info "[+] Installing Yarn... "
-
-  ${SUDO} ${CURL_C} /tmp/yarn_installer.sh ${YARN_URL} >>"${LOG_OUTPUT}" 2>&1 && ${SUDO} chmod a+x /tmp/yarn_installer.sh
-
-  _exec bash /tmp/yarn_installer.sh
-
-  # fix for yarn command not found
-  export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-
   # ============================================== Nodejs
 
   # Moneyd ==============================================
