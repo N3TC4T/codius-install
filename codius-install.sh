@@ -39,7 +39,6 @@ HYPERD_URL="https://codius-hyper-install.s3.amazonaws.com/hyper-bootstrap.sh"
 ########## Nodejs ##########
 NODEJS_RPM_URL="https://rpm.nodesource.com/setup_10.x"
 NODEJS_DEB_URL="https://deb.nodesource.com/setup_10.x"
-YARN_URL="https://yarnpkg.com/install.sh"
 ########## Certbot ##########
 CERTBOT_AUTO_URL="https://dl.eff.org/certbot-auto"
 ########## Constant ##########
