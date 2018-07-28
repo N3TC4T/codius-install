@@ -774,9 +774,9 @@ clean(){
   for i in "${services[@]}"
   do
     if [[ "${INIT_SYSTEM}" == "systemd" ]];then
-      ${SUDO} systemctl stop $i >>"${TMPFILE}" 2>&1 
+      ${SUDO} systemctl stop $i || true
     else 
-      ${SUDO} service $i stop >>"${TMPFILE}" 2>&1
+      ${SUDO} service $i stop || true
     fi
  done
 
