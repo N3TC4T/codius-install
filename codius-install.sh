@@ -755,6 +755,7 @@ clean(){
   check_user
   check_os_platform
   check_os_distro
+  check_deps_initsystem
 
   local services=( hyperd moneyd-xrp codiusd nginx )
 
