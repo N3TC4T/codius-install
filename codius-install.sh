@@ -39,7 +39,6 @@ HYPERD_URL="https://codius-hyper-install.s3.amazonaws.com/hyper-bootstrap.sh"
 ########## Nodejs ##########
 NODEJS_RPM_URL="https://rpm.nodesource.com/setup_10.x"
 NODEJS_DEB_URL="https://deb.nodesource.com/setup_10.x"
-YARN_URL="https://yarnpkg.com/install.sh"
 ########## Certbot ##########
 CERTBOT_AUTO_URL="https://dl.eff.org/certbot-auto"
 ########## Constant ##########
@@ -402,21 +401,6 @@ install()
     ${SUDO} ${CURL_C} /tmp/nodejs_10.sh ${NODEJS_DEB_URL} >>"${LOG_OUTPUT}" 2>&1 && ${SUDO} chmod a+x /tmp/nodejs_10.sh
     _exec "bash /tmp/nodejs_10.sh && apt-get install -y nodejs"
   fi
-
-
-
-
-  # yarn ==============================================
-
-
-  show_message info "[+] Installing Yarn... "
-
-  ${SUDO} ${CURL_C} /tmp/yarn_installer.sh ${YARN_URL} >>"${LOG_OUTPUT}" 2>&1 && ${SUDO} chmod a+x /tmp/yarn_installer.sh
-
-  _exec bash /tmp/yarn_installer.sh
-
-  # fix for yarn command not found
-  export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
   # ============================================== Nodejs
 
