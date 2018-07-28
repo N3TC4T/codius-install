@@ -772,6 +772,7 @@ clean(){
   check_os_platform
   check_os_distro
 
+  local services=( hyperd moneyd-xrp codiusd nginx )
 
   show_message warn "Thie action will remove packages listed below and all config files belong to them :
   \n* Codiusd\n* Moneyd\n* Hyperd\n* Certbot\n* Nginx\n* Nodejs (npm & yarn)"
@@ -783,8 +784,26 @@ clean(){
     exit 0
   fi
 
+
+  show_message info "[!] Stoping services... "
+  for i in "${services[@]}"
+  do
+    if [[ "${INIT_SYSTEM}" == "systemd" ]];then
+      ${SUDO} systemctl stop $i >>"${TMPFILE}" 2>&1 
+    else 
+      ${SUDO} service $i stop >>"${TMPFILE}" 2>&1
+    fi
+ done
+
+  # umount hyperd running pods 
+  for mount in `cat /proc/mounts | grep /run/hyper | awk '{ print $2 }'`; do umount $mount || true; done
+  for mount in `cat /proc/mounts | grep /var/lib/hyper/hosts | awk '{ print $2 }'`; do umount $mount || true; done
+
   # remove packages from yarn
-  ${SUDO} yarn global remove moneyd codiusd moneyd-uplink-xrp
+  if (command_exist yarn);then
+    ${SUDO} yarn global remove moneyd codiusd moneyd-uplink-xrp || true
+  fi
+
 
   # npm uninstall -g
   ${SUDO} npm uninstall -g moneyd codiusd moneyd-uplink-xrp --unsafe-perm
@@ -798,7 +817,7 @@ clean(){
   fi
 
   files_to_remove=("$HOME/.moneyd.json" "$HOME/.moneyd.json.back" "/etc/systemd/system/moneyd-xrp.service" "/etc/systemd/system/codiusd.service" , "/usr/bin/certbot", "/etc/nginx/conf.d/codius.conf")
-  dirs_to_remove=("$HOME/.yarn" "/etc/letsencrypt" "/var/lib/hyper")
+  dirs_to_remove=("$HOME/.yarn" "/etc/letsencrypt" "/var/lib/hyper" "/run/hyper" "/var/log/hyper")
 
   for f in "${files_to_remove[@]}"
   do
