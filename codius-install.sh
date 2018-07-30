@@ -444,9 +444,6 @@ WantedBy=multi-user.target" > /etc/systemd/system/moneyd-xrp.service'
   #UUID_CHANNEL=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
   #sed -i "s/btp+wss:\/\//&${UUID_CHANNEL}/g" ~/.moneyd.json
 
-  # change lisp.openafricanetwork.org as it's don't have fund to create channel
-  sed -i 's/lisp.openafricanetwork.org/client.scyl.la/g' ~/.moneyd.json
-
 
   show_message info "[*] Starting Moneyd... "
 
