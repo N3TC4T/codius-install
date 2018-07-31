@@ -664,6 +664,7 @@ server {
 update()
 {
   check_deps_initsystem
+  check_user
   # We need to check if moneyd installed with one of NPM or Yarn
 
   local PACKAGES=(moneyd codiusd moneyd-uplink-xrp)
@@ -702,7 +703,7 @@ update()
   if [ "$PACKAGE_MANAGER" == "npm" ]; then
     new_line
     show_message debug "Checking $(echo "${PACKAGES[@]}") version using NPM ..."
-    for package in $PACKAGES
+    for package in ${PACKAGES[@]}
     do
       output=$(npm -g outdated --parseable --depth=0 | grep "$package" || :)
       if [[ $output ]] ; then
