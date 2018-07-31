@@ -720,7 +720,7 @@ update()
     new_line
     show_message info "[!] please press SPACE on your keyboard to active packages to upgrade ."
     new_line
-    ${SUDO} yarn global add moneyd@latest codiusd@latest --force
+    ${SUDO} yarn global add moneyd@latest codiusd@latest moneyd-uplink-xrp@latest --force
   fi
 
   printf "\n\n"
