@@ -2,7 +2,7 @@
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
-# Last Modified Date: 13.07.2018
+# Last Modified Date: 31.07.2018
 # Last Modified By  : N3TC4T <netcat.av@gmail.com>
 # Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
@@ -664,6 +664,7 @@ server {
 update()
 {
   check_deps_initsystem
+  check_user
   # We need to check if moneyd installed with one of NPM or Yarn
 
   local PACKAGES=(moneyd codiusd moneyd-uplink-xrp)
@@ -702,7 +703,7 @@ update()
   if [ "$PACKAGE_MANAGER" == "npm" ]; then
     new_line
     show_message debug "Checking $(echo "${PACKAGES[@]}") version using NPM ..."
-    for package in $PACKAGES
+    for package in ${PACKAGES[@]}
     do
       output=$(npm -g outdated --parseable --depth=0 | grep "$package" || :)
       if [[ $output ]] ; then
@@ -719,7 +720,7 @@ update()
     new_line
     show_message info "[!] please press SPACE on your keyboard to active packages to upgrade ."
     new_line
-    ${SUDO} yarn global add moneyd@latest codiusd@latest --force
+    ${SUDO} yarn global add moneyd@latest codiusd@latest moneyd-uplink-xrp@latest --force
   fi
 
   printf "\n\n"
