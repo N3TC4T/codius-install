@@ -911,6 +911,9 @@ debug(){
   export DEBUG=*
   # get hostname
   local HOSTNAME=$(hostname)
+  # some env variables
+  export CODIUS_PUBLIC_URI=https://$HOSTNAME
+
 
   local services=( hyperd moneyd codiusd nginx )
   local commands=( node npm hyperd hyperctl moneyd codiusd certbot )
