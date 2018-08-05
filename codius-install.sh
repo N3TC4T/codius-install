@@ -559,7 +559,7 @@ EOF
     # Install Package
     # Selinux allow nginx
     # Enable access for port 443 in firewalld
-    _exec "yum -y install nginx ; setsebool -P httpd_can_network_connect 1 ; firewall-cmd --zone=public --add-port=443/tcp --permanent"
+    _exec "yum -y install nginx ; setsebool -P httpd_can_network_connect 1 ; firewall-cmd --zone=public --add-port=443/tcp --permanent ; firewall-cmd --reload"
 
   elif [[ "${LSB_DISTRO}" == "ubuntu" ]] || [[ "${LSB_DISTRO}" == "debian" ]] ;then
     # Install Package
