@@ -2,7 +2,7 @@
 # File              : codius-install.sh
 # Author            : N3TC4T <netcat.av@gmail.com>
 # Date              : 16.06.2018
-# Last Modified Date: 01.08.2018
+# Last Modified Date: 06.08.2018
 # Last Modified By  : N3TC4T <netcat.av@gmail.com>
 # Copyright (c) 2018 N3TC4T <netcat.av@gmail.com>
 #
@@ -466,8 +466,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/moneyd-xrp.service'
 Description=Codiusd
 After=network.target nss-lookup.target
 [Service]
-ExecStart=/usr/bin/npm start
-WorkingDirectory=/usr/lib/node_modules/codiusd
+ExecStart=/usr/bin/codiusd
 Environment="DEBUG=*"
 Environment="CODIUS_PUBLIC_URI=https://$HOSTNAME"
 Environment="CODIUS_XRP_PER_MONTH=10"
