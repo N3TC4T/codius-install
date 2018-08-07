@@ -471,7 +471,6 @@ WorkingDirectory=/usr/lib/node_modules/codiusd
 Environment="DEBUG=*"
 Environment="CODIUS_PUBLIC_URI=https://$HOSTNAME"
 Environment="CODIUS_XRP_PER_MONTH=10"
-Environment="CODIUS_ADDITIONAL_HOST_INFO=true"
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
