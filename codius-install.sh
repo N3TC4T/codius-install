@@ -274,7 +274,7 @@ check_user() {
     else
       show_message error "${ERR_ROOT_PRIVILEGE_REQUIRED[1]}" && exit ${ERR_ROOT_PRIVILEGE_REQUIRED[0]}
     fi
-    show_message info "${WHITE}Hint: This installer need root privilege\n"
+    show_message info "${WHITE}Hint: This installer needs root privilege\n"
     ${SUDO} echo -e "\n"
   fi
 }
@@ -532,7 +532,7 @@ EOF
   fi
 
   new_line
-  show_message warn "In next step you need to create two TXT challenges record on your DNS \nPlease don't forget to wait some minute after creating records! "
+  show_message warn "In the next step you need to create two TXT challenges record on your DNS \nPlease don't forget to wait some time after creating these records! "
   read -n1 -r -p "Press any key to continue ..."
 
   # if [[ "${USE_WGET}" == "true" ]];then
@@ -574,7 +574,7 @@ EOF
 
   ${SUDO} echo 'return 301 https://$host$request_uri;' | ${SUDO} tee /etc/nginx/default.d/ssl-redirect.conf >> "${LOG_OUTPUT}" 2>&1
 
-  show_message info "[!] Generating SSL file (it's take a while , don't panic)... "
+  show_message info "[!] Generating SSL file (it takes a while, don't panic)... "
 
   _exec openssl dhparam -out /etc/nginx/dhparam.pem 2048
 
@@ -641,7 +641,7 @@ server {
   new_line
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
   new_line
-  show_message done "[!] Congratulations , it's look like Codius installed successfuly!"
+  show_message done "[!] Congratulations, it looks like Codius installed successfuly!"
   new_line
   show_message done "[-] You can check your Codius by opening https://$HOSTNAME or by searching for your host at https://codiushosts.com"
   show_message done "[-] For installation log visit $LOG_OUTPUT"
@@ -650,7 +650,7 @@ server {
 
 
   new_line
-  show_message warn "If you have problem in opening the Codius it's recommended to reboot your system in order to complate the installation proccess ..."
+  show_message warn "If you have problems opening Codius then it's recommended to reboot your system in order to complete the installation proccess ..."
   new_line
   read -p "Reboot now? [y/N]: " -e REBOOT
 
@@ -762,7 +762,7 @@ clean(){
 
   local services=( hyperd moneyd-xrp codiusd nginx )
 
-  show_message warn "Thie action will remove packages listed below and all config files belong to them :
+  show_message warn "This action will remove packages listed below and all config files belong to them :
   \n* Codiusd\n* Moneyd\n* Hyperd\n* Certbot\n* Nginx\n* Nodejs (npm & yarn)"
 
   new_line
@@ -941,10 +941,10 @@ debug(){
         fi
 
     else
-        show_message warn "It's look like codius is not running as expected ..."
+        show_message warn "It's look like Codius is not running as expected ..."
     fi
   else
-     show_message warn "It's look like codius is not running as expected ..."
+     show_message warn "It's look like Codius is not running as expected ..."
   fi
 
 
@@ -974,8 +974,8 @@ debug(){
   done
 
 
-  show_message info "[?] Creating full services log file ?"
-  show_message warn "With this action all codius services will be restart for debuging"
+  show_message info "[?] Creating full services log file?"
+  show_message warn "With this action all codius services will restart for debuging"
   new_line
   read -p "Do you want to continue ? [y/N]: " -e DEBUG
   if ! [[ "$DEBUG" = 'y' || "$DEBUG" = 'Y' ]]; then
