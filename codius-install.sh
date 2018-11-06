@@ -79,7 +79,7 @@ cat <<"EOF"
     \____\___/ \__,_|_|\__,_|___/ |___|_| |_|___/\__\__,_|_|_|\___|_|   
 
 
-This script will let you setup your own codius peer in no more than two minute,
+This script will let you setup your own Codius host in no more than two minutes,
 even if you haven't used codius before. 
 It has been designed to be as unobtrusive and universal as possible.
 
@@ -317,20 +317,20 @@ install()
   fi
 
   # Hostname
-  echo "[+] What is your Codius hostname ?"
+  echo "[+] What is your Codius hostname?"
   read -p "Hostname: " -e -i codius.example.com HOSTNAME
   if [[ -z "$HOSTNAME" ]]; then
-    show_message error "No Hostname entered , exiting ..."
+    show_message error "No Hostname entered, exiting..."
     exit 0
   fi
 
-  # Wallet secret for moneyd
-  echo "[+] What is your XRP wallet secret (need for moneyd) ?"
+  # Wallet secret for Moneyd
+  echo "[+] What is your XRP wallet secret? This is required for you to receive XRP via Moneyd."
 
   while true; do
     read -p "Wallet Secret: " -e SECRET
     if [[ -z "$SECRET" ]] || ! [[ "$SECRET" =~ ^s[a-zA-Z0-9]{28,}+$ ]] ; then
-      show_message error "Invalid Secret entered, try again... "
+      show_message error "Invalid wallet secret entered, try again..."
     else
       break
     fi
@@ -338,12 +338,12 @@ install()
 
 
   # Email for certbot
-  echo "[+] What is your Email address ?"
+  echo "[+] What is your email address?"
   while true; do
     read -p "Email: " -e EMAIL
 
     if [[ -z "$EMAIL" ]] || ! [[ "$EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$ ]]; then
-        show_message error "Invalid Email entered, try again..."
+        show_message error "Invalid email entered, try again..."
     else
       break
     fi
@@ -357,7 +357,7 @@ install()
 
   # Repositories and required packages ====================================
 
-  show_message info "[+] Installing required packages... "
+  show_message info "[+] Installing required packages..."
 
   if [[ "${LSB_DISTRO}" == "centos" ]] && [[ "${CMAJOR}" == "7" ]];then
     _exec "rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm ; yum install -y gcc-c++ make epel-release git"
@@ -428,7 +428,7 @@ Group=root
 WantedBy=multi-user.target" > /etc/systemd/system/moneyd-xrp.service'
 
 
-  # Configuring moneyd and start service
+  # Configuring Moneyd and starting service
   if [ -f ~/.moneyd.json ]; then
     show_message warn "old ~/.moneyd.json config file found , backup to ~/.moneyd.json.back"
     ${SUDO} mv ~/.moneyd.json ~/.moneyd.json.back
@@ -479,7 +479,7 @@ Group=root
 [Install]
 WantedBy=multi-user.target" > /etc/systemd/system/codiusd.service'
 
-  show_message info "[*] Starting Codius... "
+  show_message info "[*] Starting Codius..."
 
   if [[ "${INIT_SYSTEM}" == "systemd" ]];then
     _exec "systemctl daemon-reload; systemctl enable codiusd ; systemctl restart codiusd"
@@ -492,7 +492,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/codiusd.service'
 
   # Subdomain DNS ==============================================
   new_line
-  show_message info "[+] Please create two A records as below on your DNS :"
+  show_message info "[+] Please create two A records within your domain DNS like the examples below:"
   new_line
   cat <<EOF
 ------------------------------------------------------------
@@ -509,7 +509,7 @@ EOF
     if ping -c1 -W1 $HOSTNAME &> /dev/null; then
       break
     else
-      show_message warn "It's look like the $HOSTNAME cannot be resolved yet , waiting 30s ... "
+      show_message warn "It looks like the $HOSTNAME cannot be resolved yet, waiting 30s... "
     fi
     sleep 30 #check again in SLEEP seconds
   done
@@ -532,8 +532,8 @@ EOF
   fi
 
   new_line
-  show_message warn "In the next step you need to create two TXT challenges record on your DNS \nPlease don't forget to wait some time after creating these records! "
-  read -n1 -r -p "Press any key to continue ..."
+  show_message warn "In the next step you need to create two TXT records on your DNS as part of the DNS challenge \nPlease wait some time after creating these records before continuing."
+  read -n1 -r -p "Press any key to continue..."
 
   # if [[ "${USE_WGET}" == "true" ]];then
   #       ${CURL_C} -O /usr/sbin/certbot-auto ${CERTBOT_URL} >>"${LOG_OUTPUT}" 2>&1 && chmod a+x /usr/sbin/certbot-auto
@@ -566,7 +566,7 @@ EOF
 
   fi
 
-  # show_message done "[!] Success Installed Nginx"
+  # show_message done "[!] Success installed Nginx"
 
   if [[ ! -e /etc/nginx/default.d ]]; then
 	  ${SUDO} mkdir /etc/nginx/default.d
@@ -574,7 +574,7 @@ EOF
 
   ${SUDO} echo 'return 301 https://$host$request_uri;' | ${SUDO} tee /etc/nginx/default.d/ssl-redirect.conf >> "${LOG_OUTPUT}" 2>&1
 
-  show_message info "[!] Generating SSL file (it takes a while, don't panic)... "
+  show_message info "[!] Generating SSL file... It takes a while, don't panic."
 
   _exec openssl dhparam -out /etc/nginx/dhparam.pem 2048
 
@@ -641,7 +641,7 @@ server {
   new_line
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
   new_line
-  show_message done "[!] Congratulations, it looks like Codius installed successfuly!"
+  show_message done "[!] Congratulations, it looks like you installed Codius successfully!"
   new_line
   show_message done "[-] You can check your Codius by opening https://$HOSTNAME or by searching for your host at https://codiushosts.com"
   show_message done "[-] For installation log visit $LOG_OUTPUT"
@@ -650,7 +650,7 @@ server {
 
 
   new_line
-  show_message warn "If you have problems opening Codius then it's recommended to reboot your system in order to complete the installation proccess ..."
+  show_message warn "If you have problems opening Codius we recommend rebooting your system to complete the installation."
   new_line
   read -p "Reboot now? [y/N]: " -e REBOOT
 
@@ -670,17 +670,17 @@ update()
 {
   check_deps_initsystem
   check_user
-  # We need to check if moneyd installed with one of NPM or Yarn
+  # We need to check if Moneyd installed with NPM or Yarn
 
   local PACKAGES=(moneyd codiusd moneyd-uplink-xrp)
   local PACKAGE_MANAGER=
 
-  show_message info "[-] Checking packages availability ..."
+  show_message info "[-] Checking packages availability..."
   for package in "${PACKAGES[@]}"
   do
     local FOUND_IN_YARN=0
     local FOUND_IN_NPM=0
-    # check if moneyd installed with NPM
+    # check if Moneyd installed with NPM
     npm list --depth 0 --global "$package" > /dev/null 2>&1 && { local FOUND_IN_NPM=1; }
     # check in Yarn
     yarn global list --depth=0 2>&1 | grep -q "$package" && { local FOUND_IN_YARN=1; }
@@ -723,13 +723,13 @@ update()
   else
     show_message debug "Updating $(echo "${PACKAGES[@]}") using YARN ..."
     new_line
-    show_message info "[!] please press SPACE on your keyboard to active packages to upgrade ."
+    show_message info "[!] please press SPACE on your keyboard to activate the packages needed to upgrade."
     new_line
     ${SUDO} yarn global add moneyd@latest codiusd@latest moneyd-uplink-xrp@latest --force
   fi
 
   printf "\n\n"
-  read -p "[?] Restarting Moneyd and Codiusd services ? [y/N]: " -e RESTART_SERVICE
+  read -p "[?] Restarting Moneyd and Codiusd services? [y/N]: " -e RESTART_SERVICE
 
   if [[ "$RESTART_SERVICE" = 'y' || "$RESTART_SERVICE" = 'Y' ]]; then
       for service in moneyd-xrp codiusd
@@ -743,7 +743,7 @@ update()
       done
   fi
   printf "\n\n"
-  show_message done "[!] Everything Done!"
+  show_message done "[!] Everything done!"
 
   printf "\n\n"
 
@@ -762,11 +762,11 @@ clean(){
 
   local services=( hyperd moneyd-xrp codiusd nginx )
 
-  show_message warn "This action will remove packages listed below and all config files belong to them :
+  show_message warn "This action will remove packages listed below and all configuration files belonging to them:
   \n* Codiusd\n* Moneyd\n* Hyperd\n* Certbot\n* Nginx\n* Nodejs (npm & yarn)"
 
   new_line
-  read -p "Continue Anyway ? [y/N]: " -e CONTINUE
+  read -p "Continue Anyway? [y/N]: " -e CONTINUE
 
   if ! [[ "$CONTINUE" = 'y' || "$CONTINUE" = 'Y' ]]; then
     exit 0
@@ -827,7 +827,7 @@ clean(){
   fi
 
   printf "\n\n"
-  show_message done "[*] Everything cleaned successfuly!"
+  show_message done "[*] Everything cleaned successfully!"
   printf "\n\n"
 
   exit 0
@@ -837,7 +837,7 @@ clean(){
 ################### RENEW ###########################
 renew()
 {
-  show_message info "[*] Checking for certificate status ..."
+  show_message info "[*] Checking for certificate status..."
   new_line
   new_line
 
@@ -856,11 +856,11 @@ renew()
   local renewDate=`date -d @$renewDateUnix`
 
   if [ $renewDateUnix -gt $todayUnix  ]; then
-     show_message success "You still have time. \nToday is ${today}. \nWaiting until ${renewDate} to renew. \n${notAfter} is when your SSL cert expires. "
+     show_message success "You still have time. \nToday is ${today}. \nWaiting until ${renewDate} to renew. \n${notAfter} is when your SSL certificate expires."
      new_line
      exit 0
   else
-    show_message warn "Time to renew your cert. Today is ${today} and your cert expires ${notAfter}"
+    show_message warn "Time to renew your certificate. Today is ${today} and your certificate expires ${notAfter}."
   fi
 
 
@@ -870,17 +870,17 @@ renew()
     show_message error "${ERR_NO_CERTBOT_INSTALLED[1]}" && exit ${ERR_NO_CERTBOT_INSTALLED[0]}
   fi
 
-  # ask if user want's to renew
+  # ask if user wants to renew
   read -p "Do you want to renew? [y/N]: " -e RENEW
 
   if [[ "$RENEW" = 'y' || "$RENEW" = 'Y' ]]; then
     new_line
-    show_message warn "If the challenge TXT dosn't exist in your DNS please create them. \nAnd Please don't forget to wait some minute after creating records! "
+    show_message warn "If the challenge TXT dosn't exist in your DNS please create them. \nAnd Please don't forget to wait some time after creating records!"
     read -n1 -r -p "Press any key to continue ..."
 
     ${SUDO} ${CERTBOT} certonly --manual -d "${HOSTNAME}" -d "*.${HOSTNAME}" --agree-tos  --preferred-challenges dns-01  --server https://acme-v02.api.letsencrypt.org/directory
 
-    show_message info "[!] Regenerating SSL file (it's take a while , don't panic)... "
+    show_message info "[!] Regenerating SSL file. It takes a while, don't panic."
     _exec openssl dhparam -out /etc/nginx/dhparam.pem 2048
 
     show_message info "[*] Restarting Nginx... "
@@ -891,7 +891,7 @@ renew()
       _exec "service nginx restart"
     fi
 
-    show_message done "[*] Everything done !"
+    show_message done "[*] Everything done!"
     new_line
   fi
 
@@ -932,7 +932,7 @@ debug(){
   if [[ $status ]]; then
     validate=( $status )
     if [ ${validate[-2]} == "200" ]; then
-        show_message success "[*] looks likes Codius is running properly in your host ."
+        show_message success "[*] It looks likes Codius is running properly in your host."
         new_line
         read -p "Continue Anyway ? [y/N]: " -e CONTINUE
 
@@ -941,10 +941,10 @@ debug(){
         fi
 
     else
-        show_message warn "It's look like Codius is not running as expected ..."
+        show_message warn "It looks like Codius is not running as expected ..."
     fi
   else
-     show_message warn "It's look like Codius is not running as expected ..."
+     show_message warn "It looks like Codius is not running as expected..."
   fi
 
 
@@ -975,7 +975,7 @@ debug(){
 
 
   show_message info "[?] Creating full services log file?"
-  show_message warn "With this action all codius services will restart for debuging"
+  show_message warn "With this action all Codius services will restart for debuging."
   new_line
   read -p "Do you want to continue ? [y/N]: " -e DEBUG
   if ! [[ "$DEBUG" = 'y' || "$DEBUG" = 'Y' ]]; then
@@ -997,7 +997,7 @@ debug(){
  done
 
   show_message info "[!] Execute services and commands in debug mode ... "
-  show_message info "[*] This will take some time ..."
+  show_message info "[*] This will take some time..."
   for c in "${debug_commands[@]}"
   do
     echo -e "\n==================================" >> "${TMPFILE}"
@@ -1011,7 +1011,7 @@ debug(){
     exec 3>&-
   done
 
-  show_message info "[!] Killing debug proccess ..."
+  show_message info "[!] Killing debug proccess..."
   commands_to_kill=(moneyd codiusd hyperd)
   for p in "${commands_to_kill[@]}"
   do
@@ -1031,7 +1031,7 @@ debug(){
 
   new_line
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
-  show_message done "[!] The Debuging Proccess is done ."
+  show_message done "[!] The debuging proccess is done."
   new_line
   show_message done "[-] Please check $TMPFILE for full log output ."
   printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
@@ -1059,7 +1059,7 @@ check_script_update() {
       chmod +x "$tmpfile"
       cat <<<"$LATEST_FILE" > "$tmpfile"
       mv "$tmpfile" "$0"
-      show_message done "\n[-] Installer successfuly updated to the latest version , please restart the script to continue.\n"
+      show_message done "\n[-] Installer successfully updated to the latest version. Please restart the script to continue.\n"
       exit
     fi
   fi
@@ -1080,7 +1080,7 @@ do
 
   echo "What do you want to do?"
                   echo "   1) Install and run Codius in your system"
-                  echo "   2) Check your system for codius errors"
+                  echo "   2) Check your system for Codius errors"
                   echo "   3) Check for certificate status and renew"
                   echo "   4) Cleanup the codius from the server"
                   echo "   5) Update Codiusd & Moneyd to the lastest version"
