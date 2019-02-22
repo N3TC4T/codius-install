@@ -436,7 +436,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/moneyd-xrp.service'
 
 
   # Todo: need to check
-  # https://github.com/xrp-community/codius-install/issues/4
+  # https://github.com/N3TC4T/codius-install/issues/4
 
   echo -ne "$SECRET\n" | ${SUDO} $(which moneyd) xrp:configure > /dev/null 2>&1 || { show_message error "${ERR_MONEYD_CONFIGURE[1]}" ; exit "${ERR_MONEYD_CONFIGURE[0]}" ; }
 
