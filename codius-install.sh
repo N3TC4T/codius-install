@@ -33,7 +33,7 @@ SLEEP_SEC=10
 LOG_OUTPUT="/tmp/${0##*/}$(date +%Y-%m-%d.%H-%M)"
 CURRENT_USER="$(id -un 2>/dev/null || true)"
 BASE_DIR=$(cd "$(dirname "$0")"; pwd); cd ${BASE_DIR}
-INSTALLER_URL="https://raw.githubusercontent.com/xrp-community/codius-install/master/codius-install.sh"
+INSTALLER_URL="https://raw.githubusercontent.com/N3TC4T/codius-install/master/codius-install.sh"
 ########## Hyperd ##########
 HYPERD_URL="https://codius-hyper-install.s3.amazonaws.com/hyper-bootstrap.sh"
 ########## Nodejs ##########
